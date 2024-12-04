@@ -8,7 +8,8 @@ description = ""
 readme = "README.md"
 dynamic = ["version"]
 dependencies = [ 
-	"numpy"
+	"numpy",
+	"fortranformat"
 ]
 
 [tool.setuptools.dynamic]
