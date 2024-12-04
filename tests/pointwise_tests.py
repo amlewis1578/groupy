@@ -10,7 +10,7 @@ def U238_356_file():
     return filename
 
 
-def test_u238_energies(U238_356_file):
+def test_u238_total(U238_356_file):
     assert U238_356_file.exists()
     with open(U238_356_file, "r") as f:
         lines = f.readlines()
@@ -26,4 +26,23 @@ def test_u238_energies(U238_356_file):
     assert len(obj.values) == obj.number_groups
     assert np.isclose(obj.temperature, 293)
     assert np.isclose(obj.values[0], 1.105207e1)
+    assert np.isclose(obj.flux_values[0], 1.057475e-1)
+
+
+def test_u238_nubar(U238_356_file):
+    assert U238_356_file.exists()
+    with open(U238_356_file, "r") as f:
+        lines = f.readlines()
+
+    nubar_lines = lines[170:232]
+
+    obj = PointwiseValues(nubar_lines)
+
+    assert obj.ZA == 92238
+    assert obj.mt == 452
+    assert obj.number_groups == 30
+    assert obj.number_legendre == 1
+    assert len(obj.values) == obj.number_groups
+    assert np.isclose(obj.temperature, 293)
+    assert np.isclose(obj.values[0], 2.443041)
     assert np.isclose(obj.flux_values[0], 1.057475e-1)
