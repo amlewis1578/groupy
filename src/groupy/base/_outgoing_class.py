@@ -2,14 +2,13 @@ import fortranformat as ff
 import numpy as np
 
 
-class PointwiseValues:
-    """Class to hold pointwise values like cross section and
-    nubar
+class OutgoingDistribution:
+    """Class to hold outgoing energy or angle distributions
 
     Parameters
     ----------
     lines : list of strings
-        the MF3 lines from the GENDF file
+        the lines from the GENDF file
 
     Attributes
     ----------
@@ -20,13 +19,10 @@ class PointwiseValues:
         the number of groups
 
     values : np.array of floats
-        the values (in barns for cross sections)
+        the values
 
     number_legendre : int
         the number of Legendre coeffs used in the calculation
-
-    flux_values : np.array of floats
-        the flux values
 
     temperature : float
         the temperature of the calculation in K
@@ -60,12 +56,12 @@ class PointwiseValues:
 
         """
         control_line = ff.FortranRecordReader("(2G11.0,4I11,I4,I2,I3,I5)")
-        value_line = ff.FortranRecordReader("(2G11.0)")
+        value_line = ff.FortranRecordReader("(6G11.0)")
 
         self.ZA, _, nl, nz, lrflag, ngn, mat, mf, mt, _ = control_line.read(lines[0])
 
-        if mf != 3:
-            raise ValueError(f"PointwiseValues must come from MF3, not MF{mf}")
+        if mf not in [5]:
+            raise ValueError(f"Outgoing distributions must come from MF5, not MF{mf}")
 
         # check that there is only 1 sigma0 value
         if nz != 1:
@@ -77,14 +73,9 @@ class PointwiseValues:
         self.number_groups = ngn
         self.number_legendre = nl
 
-        self.values = np.zeros(self.number_groups)
-        self.flux_values = np.zeros(self.number_groups)
-        for i in range(self.number_groups):
-            temp, _, ng2, ig2lo, nw, ig, _, _, _, _ = control_line.read(
-                lines[2 * i + 1]
-            )
-            flux, sigma = value_line.read(lines[2 * i + 2])
-            self.values[ig - 1] = sigma
-            self.flux_values[ig - 1] = flux
+        self.temperature, _, _, _, _, _, _, _, _, _ = control_line.read(lines[1])
 
-        self.temperature = temp
+        self.values = np.zeros(self.number_groups)
+
+        for i in range(int(np.ceil(self.number_groups / 6))):
+            self.values[i * 6 : (i + 1) * 6] = value_line.read(lines[2 + i])
