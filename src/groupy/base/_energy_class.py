@@ -1,4 +1,5 @@
 import fortranformat as ff
+import numpy as np
 
 
 class EnergyBoundaryValues:
@@ -63,3 +64,5 @@ class EnergyBoundaryValues:
             for val in energy_line.read(line):
                 if val > 0:
                     self.energy_boundaries.append(val)
+
+        self.energy_boundaries = np.array(self.energy_boundaries)
