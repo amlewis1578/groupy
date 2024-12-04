@@ -12,9 +12,28 @@ class EnergyBoundaryValues:
 
     Attributes
     ----------
+    number_groups : int
+        the number of groups
+
+    energy_boundaries : np.array of floats
+        the boundary values in eV
+
+    ZA : int
+        the isotope ZA
+
+    AWR : float
+        the isotope AWR
+
+    group_types : str
+        the particle type for the groups ("neutron" or "gamma")
+
+    sigma0 : float
+        the sigma0 value for the calculation
 
     Methods
     -------
+    parse_lines
+        Function to parse the lines
 
     """
 
@@ -23,6 +42,18 @@ class EnergyBoundaryValues:
         self.parse_lines(lines)
 
     def parse_lines(self, lines):
+        """Function to parse the lines
+
+        Parameters
+        ----------
+        lines : list of strings
+            the lines from the GENDF file
+
+        Returns
+        -------
+        None
+
+        """
         control_line = ff.FortranRecordReader("(2G11.0,4I11,I4,I2,I3,I5)")
         energy_line = ff.FortranRecordReader("(6G11.0)")
 
