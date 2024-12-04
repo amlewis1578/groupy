@@ -87,4 +87,7 @@ class PointwiseValues:
             self.values[ig - 1] = sigma
             self.flux_values[ig - 1] = flux
 
+            if ig == self.number_groups:
+                break
+
         self.temperature = temp

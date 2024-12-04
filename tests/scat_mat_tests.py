@@ -2,6 +2,7 @@ from groupy.base._scattering_mat_class import ScatteringMatrix
 from pathlib import Path
 import pytest
 import numpy as np
+import ENDFtk
 
 
 @pytest.fixture
@@ -10,14 +11,18 @@ def U238_356_file():
     return filename
 
 
-def test_u238_elastic_scattering_matrix(U238_356_file):
-    assert U238_356_file.exists()
-    with open(U238_356_file, "r") as f:
-        lines = f.readlines()
+@pytest.fixture
+def U238_356(U238_356_file):
+    tape = ENDFtk.tree.Tape.from_file(str(U238_356_file))
+    mat = tape.material(tape.material_numbers[0])
+    mf6 = mat.file(6)
+    return mf6
 
-    scat_mat_lines = lines[240:361]
 
-    obj = ScatteringMatrix(scat_mat_lines)
+def test_u238_elastic_scattering_matrix(U238_356):
+
+    lines = U238_356.section(2).content.splitlines()
+    obj = ScatteringMatrix(lines)
 
     assert obj.ZA == 92238
     assert obj.mt == 2
@@ -29,12 +34,9 @@ def test_u238_elastic_scattering_matrix(U238_356_file):
     assert obj.values[4, 3, 0] == 7.07267e-2
 
 
-def test_u238_n2n_scattering_matrix(U238_356_file):
-    assert U238_356_file.exists()
-    with open(U238_356_file, "r") as f:
-        lines = f.readlines()
+def test_u238_n2n_scattering_matrix(U238_356):
 
-    scat_mat_lines = lines[361:481]
+    scat_mat_lines = U238_356.section(16).content.splitlines()
 
     obj = ScatteringMatrix(scat_mat_lines)
 

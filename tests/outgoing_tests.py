@@ -2,6 +2,7 @@ from groupy.base._outgoing_class import OutgoingDistribution
 from pathlib import Path
 import pytest
 import numpy as np
+import ENDFtk
 
 
 @pytest.fixture
@@ -10,12 +11,17 @@ def U238_356_file():
     return filename
 
 
-def test_u238_pfns(U238_356_file):
-    assert U238_356_file.exists()
-    with open(U238_356_file, "r") as f:
-        lines = f.readlines()
+@pytest.fixture
+def U238_356(U238_356_file):
+    tape = ENDFtk.tree.Tape.from_file(str(U238_356_file))
+    mat = tape.material(tape.material_numbers[0])
+    mf = mat.file(5)
+    return mf
 
-    pfns_lines = lines[232:240]
+
+def test_u238_pfns(U238_356):
+
+    pfns_lines = U238_356.section(18).content.splitlines()
 
     obj = OutgoingDistribution(pfns_lines)
 
