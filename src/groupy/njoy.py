@@ -88,7 +88,7 @@ def run_njoy(
             print(f"\t{mat_num} does not have nubar")
 
     # check for PFNS
-    if mat.file(5).has_MT(18):
+    if mat.has_MF(5) and mat.file(5).has_MT(18):
         has_pfns = True
         if verbose:
             print(f"\t{mat_num} has PFNS")

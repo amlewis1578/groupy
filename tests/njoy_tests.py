@@ -2,6 +2,7 @@ from groupy import run_njoy
 from groupy.njoy import write_njoy_input
 from pathlib import Path
 import pytest
+import ENDFtk
 import numpy as np
 
 
@@ -135,3 +136,35 @@ def test_create_U238_356(U238_endf_file, U238_input, U238_356, test_dir):
     assert njoy_output.exists()
 
     assert title in njoy_output.read_text(encoding=None)
+
+
+@pytest.mark.fishing
+def test_all_njoy_input(test_dir):
+    endf80_dir = Path("/home/amanda/libraries/endf80/")
+    if not endf80_dir.exists():
+        return None
+    else:
+        for fle in endf80_dir.glob("*.endf"):
+            print(fle)
+            tape = ENDFtk.tree.Tape.from_file(str(fle))
+            mat_num = tape.material_numbers[0]
+            write_njoy_input(mat_num, "")
+
+
+@pytest.mark.fishing
+def test_all_run_njoy(test_dir):
+    endf80_dir = Path("/home/amanda/libraries/endf80/")
+    if not endf80_dir.exists():
+        return None
+    else:
+        for fle in endf80_dir.glob("*.endf"):
+            print(fle)
+            run_njoy(
+                fle,
+                "",
+                directory=test_dir,
+                reconr_tolerance=0.1,
+                broadr_tolerance=0.1,
+                group_boundaries=[1e-5, 2e7],
+                legendre_order=1,
+            )
