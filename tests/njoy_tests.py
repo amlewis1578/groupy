@@ -17,6 +17,12 @@ def U238_input():
     return filename
 
 
+@pytest.fixture
+def U238_356():
+    filename = Path(__file__).parent / "files" / "U238_356"
+    return filename
+
+
 @pytest.fixture(scope="session")
 def test_dir(tmpdir_factory):
     test_dir = tmpdir_factory.mktemp("groupr")
@@ -42,7 +48,7 @@ def test_njoy_lines_U238_356(U238_input):
     assert result == ans[: len(result)]
 
 
-def test_njoy_lines(U238_input):
+def test_njoy_lines():
     mat = 9237
     title = "test2 with 238U"
     reconr_tol = 0.01
@@ -106,10 +112,26 @@ def test_njoy_lines(U238_input):
     assert result == ans[: len(result)]
 
 
-@pytest.mark.notready
-def test_create_U238_356(U238_endf_file, test_dir):
-    title = "teset run"
-    run_njoy(U238_endf_file, title, directory=test_dir, verbose=True)
+@pytest.mark.slow
+def test_create_U238_356(U238_endf_file, U238_input, U238_356, test_dir):
+    title = "test with 238U"
+    groups = 3
+    reconr_tol = 0.01
+    run_njoy(
+        U238_endf_file,
+        title,
+        directory=test_dir,
+        group_boundaries=groups,
+        reconr_tolerance=reconr_tol,
+        verbose=True,
+    )
 
     njoy_input = test_dir / "input"
     assert njoy_input.exists()
+
+    assert U238_input.read_text(encoding=None) == njoy_input.read_text(encoding=None)
+
+    njoy_output = test_dir / "output"
+    assert njoy_output.exists()
+
+    assert title in njoy_output.read_text(encoding=None)
