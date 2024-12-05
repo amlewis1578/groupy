@@ -13,7 +13,7 @@ def run_njoy(
     broadr_tolerance=0.001,
     group_boundaries=2,
     flux=5,
-    legendre_order=4,
+    legendre_order=1,
     verbose=False,
 ):
     """Function to create an njoy input file and run njoy
@@ -43,7 +43,7 @@ def run_njoy(
         The group boundaries to use. If an integer, it represents ign in the
         NJOY input. If a list, it is the energy boundaries in eV.
 
-    flux : int
+    flux : int, optional, default is 5
         The weighting flux to use - the iwt value in the NJOY input. Currently
         the only iwt values allowed are:
             2   constant
@@ -53,7 +53,7 @@ def run_njoy(
             11  vitamin-e weight function
 
 
-    legendre_order : int, optional, default is 4
+    legendre_order : int, optional, default is 1
         the order to reconstruct the angular distributions
 
 
