@@ -1,5 +1,6 @@
 import ENDFtk
 from pathlib import Path
+import numpy as np
 from groupy.base._energy_class import EnergyBoundaryValues
 from groupy.base._pointwise_class import PointwiseValues
 from groupy.base._outgoing_class import OutgoingDistribution
@@ -88,3 +89,109 @@ class GrouprOutput:
 
             else:
                 raise NotImplementedError(f"GrouprOutput can't yet parse MF{mf}")
+
+    def write_to_csv(self, title=None, directory=None, verbose=False):
+        """Function to write the grouped values into CSV files.
+
+        All of the pointwise values are written into {title}_pointwise.csv, with
+            the MT values as the column headers.
+        All of the outgoing distributions are written into {title}_outgoing.csv,
+            with the MT values as the column headers.
+        Each of the scattering matrices are written to individual files,
+            {title}_scattering_matrix_{mt}_{ell}.csv, with the energy boundaries
+            as the row and column headers.
+
+        Parameters
+        ----------
+        title : string, optional, default is an empty string
+            title for the csv files. Default is an empty string
+
+        directory : string, optional, default is None
+            path of the directory where the files should be written
+
+        verbose : bool, optional, default is False
+            If true, will print the files names as they are created
+
+        Returns
+        -------
+        None
+
+        """
+
+        # create file title
+        if len(title) > 0:
+            stem = f"{title}_"
+
+        if directory is not None:
+            stem = f"{directory}/{stem}"
+
+        # pointwise
+        if hasattr(self, "pointwise"):
+            filename = Path(f"{stem}pointwise.csv")
+
+            header = "Energy"
+            array = np.array(self.energy_boundaries).reshape(
+                (len(self.energy_boundaries), 1)
+            )
+            for mt in self.pointwise.keys():
+                header += f",MT{mt}"
+                array = np.hstack(
+                    [
+                        array,
+                        np.append(self.pointwise[mt].values, 0).reshape(
+                            (len(self.energy_boundaries), 1)
+                        ),
+                    ]
+                )
+
+            if verbose:
+                print(f"\nWriting pointwise data to {filename}")
+            np.savetxt(filename, array, delimiter=",", header=header)
+
+        # distributions
+        if hasattr(self, "outgoing_distributions"):
+            filename = Path(f"{stem}outgoing.csv")
+
+            header = "Energy"
+            array = np.array(self.energy_boundaries).reshape(
+                (len(self.energy_boundaries), 1)
+            )
+            for mt in self.outgoing_distributions.keys():
+                header += f",MT{mt}"
+                array = np.hstack(
+                    [
+                        array,
+                        np.append(self.outgoing_distributions[mt].values, 0).reshape(
+                            (len(self.energy_boundaries), 1)
+                        ),
+                    ]
+                )
+
+            if verbose:
+                print(f"\nWriting outgoing energy distribution data to {filename}")
+            np.savetxt(filename, array, delimiter=",", header=header)
+
+        # scattering matrices
+        if hasattr(self, "scattering_matrices"):
+
+            for mt in self.scattering_matrices.keys():
+
+                for ell in range(self.scattering_matrices[mt].number_legendre):
+
+                    filename = Path(f"{stem}scattering_matrix_{mt}_{ell}.csv")
+                    array = np.zeros(
+                        (
+                            len(self.energy_boundaries) + 1,
+                            len(self.energy_boundaries) + 1,
+                        )
+                    )
+                    array[1:, 0] = self.energy_boundaries
+                    array[0, 1:] = self.energy_boundaries
+                    array[1:-1, 1:-1] = self.scattering_matrices[mt].values[:, :, ell]
+
+                    if verbose:
+                        print(
+                            f"Writing MT{mt} ell={ell} scattering matrix to {filename}"
+                        )
+
+                    np.savetxt(filename, array, delimiter=",")

@@ -29,3 +29,5 @@ The energy group boundaries, in eV, are in `obj.energy_boundaries`.
 The pointwise values are in the dictionary `obj.pointwise`, which has MT values for keys and `PointwiseValues` objects as values. The values can be accessed with `obj.pointwise[mt].values`.
 
 Outgoing energy distributions are in the dictionary `obj.outgoing_distributions`, and the scattering matrices are in the dictionary `obj.scattering_matrices`. The values are accessed and plotted in an [example file](docs/parse_gendf.ipynb).
+
+The values can be written out to CSV files with the `obj.write_to_csv()` function.
