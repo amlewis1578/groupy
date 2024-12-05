@@ -32,6 +32,6 @@ markers = [
 	"fishing: marks tests that run over a lot of files to find edge cases",
 	"notready: marks tests to skip while developing one aspect"
 ]
-python_files = "tests/*test.py"
+python_files = "tests/*test*.py"
 addopts = "-m 'not slow  and not notready and not fishing and not local'"
 
