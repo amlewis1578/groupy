@@ -55,6 +55,8 @@ class GrouprOutput:
         mat = tape.material(tape.material_numbers[0])
         self.material_number = mat.MAT
 
+        self.title = tape.content.splitlines()[0][:66].strip()
+
         for mf in mat.file_numbers.to_list():
 
             # get the energies from MF1 MT451
@@ -103,8 +105,9 @@ class GrouprOutput:
 
         Parameters
         ----------
-        title : string, optional, default is an empty string
-            title for the csv files. Default is an empty string
+        title : string, optional, default is None
+            title for the csv files. Default is None, in which case the
+            object title attribute will be used (with spaces removed)
 
         directory : string, optional, default is None
             path of the directory where the files should be written
@@ -119,7 +122,9 @@ class GrouprOutput:
         """
 
         # create file title
-        if len(title) > 0:
+        if title is None:
+            stem = f"{self.title.replace(' ','')}_"
+        else:
             stem = f"{title}_"
 
         if directory is not None:

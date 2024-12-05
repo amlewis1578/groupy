@@ -19,6 +19,8 @@ def test_dir(tmpdir_factory):
 def test_U238_356(U238_356_file, test_dir):
     obj = GrouprOutput(U238_356_file)
 
+    assert obj.title == "test with 238U"
+
     assert obj.material_number == 9237
 
     assert obj.energy_boundaries[0] == 1.390000e-4
