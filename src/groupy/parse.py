@@ -54,29 +54,37 @@ class GrouprOutput:
         mat = tape.material(tape.material_numbers[0])
         self.material_number = mat.MAT
 
-        # get the energies from MF1 MT451
-        mf1_mt451 = mat.file(1).section(451).content.splitlines()
-        self._energy_boundaries = EnergyBoundaryValues(mf1_mt451)
+        for mf in mat.file_numbers.to_list():
 
-        # go through the pointwise (MF3)
-        self.pointwise = {}
-        mf3 = mat.file(3)
-        for mt in mf3.section_numbers.to_list():
-            lines = mf3.section(mt).content.splitlines()
-            self.pointwise[mt] = PointwiseValues(lines)
+            # get the energies from MF1 MT451
+            if mf == 1:
 
-        # go through distributions (MF5)
-        self.outgoing_distributions = {}
-        if mat.has_file(5):
-            mf5 = mat.file(5)
-            for mt in mf5.section_numbers.to_list():
-                lines = mf5.section(mt).content.splitlines()
-                self.outgoing_distributions[mt] = OutgoingDistribution(lines)
+                mf1_mt451 = mat.file(mf).section(451).content.splitlines()
+                self._energy_boundaries = EnergyBoundaryValues(mf1_mt451)
 
-        # go through scattering matrices (MF6)
-        self.scattering_matrices = {}
-        if mat.has_file(6):
-            mf6 = mat.file(6)
-            for mt in mf6.section_numbers.to_list():
-                lines = mf6.section(mt).content.splitlines()
-                self.scattering_matrices[mt] = ScatteringMatrix(lines)
+            # go through the pointwise (MF3)
+            elif mf == 3:
+                self.pointwise = {}
+                mf3 = mat.file(mf)
+                for mt in mf3.section_numbers.to_list():
+                    lines = mf3.section(mt).content.splitlines()
+                    self.pointwise[mt] = PointwiseValues(lines)
+
+            # go through distributions (MF5)
+            elif mf == 5:
+                self.outgoing_distributions = {}
+                mf5 = mat.file(mf)
+                for mt in mf5.section_numbers.to_list():
+                    lines = mf5.section(mt).content.splitlines()
+                    self.outgoing_distributions[mt] = OutgoingDistribution(lines)
+
+            # go through scattering matrices (MF6)
+            elif mf == 6:
+                self.scattering_matrices = {}
+                mf6 = mat.file(mf)
+                for mt in mf6.section_numbers.to_list():
+                    lines = mf6.section(mt).content.splitlines()
+                    self.scattering_matrices[mt] = ScatteringMatrix(lines)
+
+            else:
+                raise NotImplementedError(f"GrouprOutput can't yet parse MF{mf}")
