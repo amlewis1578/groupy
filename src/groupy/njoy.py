@@ -13,8 +13,6 @@ def run_njoy(
     broadr_tolerance=0.001,
     group_boundaries=2,
     flux=5,
-    has_nubar=False,
-    has_pfns=False,
     legendre_order=4,
     verbose=False,
 ):
@@ -54,11 +52,6 @@ def run_njoy(
             9   claw weight function
             11  vitamin-e weight function
 
-    has_nubar : bool, optional, default is False
-        whether or not the evaluation has nubar
-
-    has_pfns : bool, optional, default is False
-        whether or not the evaluation has a PFNS
 
     legendre_order : int, optional, default is 4
         the order to reconstruct the angular distributions
@@ -104,6 +97,8 @@ def run_njoy(
         if verbose:
             print(f"\t{mat_num} does not have PFNS")
 
+    directory = Path(directory)
+
     # input file
     input_file = Path(directory) / "input"
     if verbose:
@@ -126,32 +121,50 @@ def run_njoy(
         )
 
     # move to the directory and run NJOY
+    old_dir = Path(".").absolute()
     os.chdir(directory)
+    if verbose:
+        print(f" Moved into {Path('.').absolute()}")
 
-    # run NJOY
-    tape20 = Path(directory / "tape20")
-    tape20.write_text(endf6_file.read_text())
+    try:
 
-    # check that njoy executable is in the path
-    if "njoy" not in os.environ["PATH"]:
-        raise EnvironmentError(f"The NJOY executable needs to be in the Path.")
+        # run NJOY
+        tape20 = Path("tape20")
+        tape20.write_text(endf6_file.read_text())
 
-    if "LD_LIBRARY_PATH" not in os.environ.keys():
-        local_lib = Path("/usr/local/lib")
-        if local_lib.exists():
-            os.environ["LD_LIBRARY_PATH"] = "/usr/local/lib"
-        else:
-            raise EnvironmentError(
-                f"LD_LIBRARY_PATH is not set, and /usr/local/lib does not exist."
-            )
+        # check that njoy executable is in the path
+        if "njoy" not in os.environ["PATH"]:
+            raise EnvironmentError(f"The NJOY executable needs to be in the Path.")
 
-    with open("input", "r") as f:
-        inp = f.read()
+        # make sure the shared library can be found
+        if "LD_LIBRARY_PATH" not in os.environ.keys():
+            local_lib = Path("/usr/local/lib")
+            if local_lib.exists():
+                os.environ["LD_LIBRARY_PATH"] = "/usr/local/lib"
+            else:
+                raise EnvironmentError(
+                    f"LD_LIBRARY_PATH is not set, and /usr/local/lib does not exist."
+                )
 
-    p1 = subprocess.Popen(["njoy"], stdin=subprocess.PIPE, text=True)
-    p1.communicate(inp)
+        with open("input", "r") as f:
+            inp = f.read()
 
-    tape20.unlink()
+        p1 = subprocess.Popen(["njoy"], stdin=subprocess.PIPE, text=True)
+        p1.communicate(inp)
+
+        if p1.returncode == 77:
+            raise RuntimeError(f"NJOY run failed")
+
+        os.chdir(old_dir)
+        if verbose:
+            print(f" Moved back to {Path('.').absolute()}")
+            print(f"NJOY completed")
+
+    except Exception as error:
+        os.chdir(old_dir)
+        if verbose:
+            print(f" Moved back to {Path('.').absolute()}")
+        raise RuntimeError(f"NJOY did not run: {error}")
 
 
 def write_njoy_input(
