@@ -29,8 +29,8 @@ class GrouprOutput:
         self.filename = Path(filename)
 
         # check that the file exists
-        if not filename.exists():
-            raise FileNotFoundError(f"The GENDF file {filename} was not found")
+        if not self.filename.exists():
+            raise FileNotFoundError(f"The GENDF file {self.filename} was not found")
 
         # parse the file
         self.parse()

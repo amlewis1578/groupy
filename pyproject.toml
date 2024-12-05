@@ -20,8 +20,8 @@ namespaces = true
 where = ["src"]
 
 
-[tool.setuptools]
-script-files = []
+[project.scripts]
+group = "groupy.cmd.run_grouping:main"
 
 
 
