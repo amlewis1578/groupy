@@ -8,7 +8,7 @@ package to parse GENDF files, which are the output of the [NJOY](https://github.
 
 The LANL program [NJOY](https://github.com/njoy/NJOY2016) must be installed, and the executable should be available on the path.  **Running NJOY with `groupy` has currently only been tested on Ubuntu 22.04**. 
 
-This package requires the LANL program [ENDFtk](https://github.com/njoy/ENDFtk).
+This package requires that the LANL program [ENDFtk](https://github.com/njoy/ENDFtk) is installed and added to the python path.
 
 ## installation
 
@@ -21,8 +21,6 @@ pip install .
 ## using the `groupy` package
 
 ### Running NJOY
-
-If NJOY is in the local path, `groupy` can run NJOY for an evaluation. 
 
 ```python
 from groupy import run_njoy
@@ -77,6 +75,8 @@ run_njoy("<endf6-file>", title)
 ```
 
 The group boundary and flux options are explained in detail in the [NJOY Manual](https://github.com/njoy/NJOY2016-manual).
+
+The `GROUPR` output is put into a file named `tape91`. 
 
 
 ### Parsing a GENDF file
