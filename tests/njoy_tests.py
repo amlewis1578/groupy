@@ -41,6 +41,7 @@ def test_njoy_lines_U238_356(U238_input):
         has_nubar=True,
         has_pfns=True,
         group_boundaries=3,
+        legendre_order=1,
     )
 
     with open(U238_input, "r") as f:

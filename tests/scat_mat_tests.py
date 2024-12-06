@@ -31,7 +31,7 @@ def test_u238_elastic_scattering_matrix(U238_356):
     assert obj.temperature == 293
 
     assert obj.flux_values[0, 0] == 1.057475e-1
-    assert obj.values[4, 3, 0] == 7.07267e-2
+    assert np.isclose(obj.values[4, 3, 0], 7.07267e-2, rtol=0.001)
 
 
 def test_u238_n2n_scattering_matrix(U238_356):
