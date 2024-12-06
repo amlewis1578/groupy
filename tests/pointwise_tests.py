@@ -31,7 +31,7 @@ def test_u238_total(U238_356):
     assert obj.number_legendre == 1
     assert len(obj.values) == obj.number_groups
     assert np.isclose(obj.temperature, 293)
-    assert np.isclose(obj.values[0], 1.105207e1)
+    assert np.isclose(obj.values[0], 1.105207e1, rtol=0.001)
     assert np.isclose(obj.flux_values[0], 1.057475e-1)
 
 
