@@ -96,4 +96,6 @@ class EnergyBoundaryValues:
                 if val > 0:
                     self.energy_boundaries.append(val)
 
-        self.energy_boundaries = np.array(self.energy_boundaries)
+        self.energy_boundaries = np.array(self.energy_boundaries)[
+            : self.number_groups + 1
+        ]
