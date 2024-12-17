@@ -14,6 +14,7 @@ def get_grouped_data(
     flux=5,
     legendre_order=1,
     verbose=False,
+    write=True,
 ):
     """Function to create an njoy input file and run njoy, then parse
     the GROUPR output and return a GrouprOutput object.
@@ -60,6 +61,9 @@ def get_grouped_data(
     verbose : bool, optional, default is False
         If true, extra information will be printed to the screen
 
+    write : bool, optional, default is True
+        If true, write out the values to csv files
+
     Returns
     --------
     GrouprOutput object
@@ -87,6 +91,7 @@ def get_grouped_data(
     obj = GrouprOutput(gendf_file)
 
     # write the output files
-    obj.write_to_csv(directory=directory, verbose=verbose)
+    if write:
+        obj.write_to_csv(directory=directory, verbose=verbose)
 
     return obj
