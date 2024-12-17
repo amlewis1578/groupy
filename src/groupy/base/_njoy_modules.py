@@ -140,8 +140,12 @@ def make_groupr(
                 try:
                     input += f"{group_boundaries[i*5+j]:.5E} "
                 except IndexError:
+                    input += "/"
                     break
-            input += "/\n"
+                if (i + 1) * (j + 1) == len(group_boundaries):
+                    input += "/"
+                    break
+            input += "\n"
 
     input += "  3 /\n"
     if has_nubar:

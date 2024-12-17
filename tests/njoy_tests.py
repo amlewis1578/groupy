@@ -169,3 +169,33 @@ def test_all_run_njoy(test_dir):
                 group_boundaries=[1e-5, 2e7],
                 legendre_order=1,
             )
+
+
+def test_writing_groups():
+    mat = 9237
+    title = "test2 with 238U"
+    reconr_tol = 0.01
+    broadr_tol = 0.0001
+    temp = 600
+    has_nubar = False
+    has_pfns = False
+    group_boundaries = [1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 1e0, 1e1, 1e3, 1e5, 2e7]
+    flux = 11
+    legendre = 2
+    result = write_njoy_input(
+        mat,
+        title,
+        temperature=temp,
+        reconr_tolerance=reconr_tol,
+        broadr_tolerance=broadr_tol,
+        has_nubar=has_nubar,
+        has_pfns=has_pfns,
+        group_boundaries=group_boundaries,
+        flux=flux,
+        legendre_order=legendre,
+    )
+
+    assert len(group_boundaries) == 10
+    print(result)
+    assert "/" not in result.splitlines()[-9]
+    assert "/" in result.splitlines()[-8]

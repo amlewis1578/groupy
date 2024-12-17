@@ -78,4 +78,5 @@ class OutgoingDistribution:
         self.values = np.zeros(self.number_groups)
 
         for i in range(int(np.ceil(self.number_groups / 6))):
-            self.values[i * 6 : (i + 1) * 6] = value_line.read(lines[2 + i])
+            vals = np.array(value_line.read(lines[2 + i]))
+            self.values[i * 6 : (i + 1) * 6] = vals[vals > 0]
