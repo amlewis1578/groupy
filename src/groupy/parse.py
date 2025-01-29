@@ -106,7 +106,7 @@ class GrouprOutput:
 
         The default MT's that will be written are:
 
-        pointwise - 1, 18, 102, 452
+        pointwise - 1, 102, 18, 452
         distributions - 18
         scattering matrices - 2, 4, 11, 16, 17, 22-25, 28-37, 41, 42, 44, 45
 
@@ -134,7 +134,7 @@ class GrouprOutput:
 
         pointwise_mts : None or list of ints, optional, default is None
             Which MT's to write out in the pointwise file. If None or not given,
-            the default MT's are [1, 18, 102, 452]. If a list of ints, the MT's
+            the default MT's are [1, 102, 18, 452]. If a list of ints, the MT's
             listed will be printed out. Zeros are printed for any MT that isn't
             found.
 
@@ -156,7 +156,7 @@ class GrouprOutput:
         """
 
         if pointwise_mts is None:
-            pointwise_mts = [1, 18, 102, 452]
+            pointwise_mts = [1, 102, 18, 452]
         if distribution_mts is None:
             distribution_mts = [18]
         if scattering_mts is None:

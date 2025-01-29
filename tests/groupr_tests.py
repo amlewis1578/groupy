@@ -36,7 +36,7 @@ def test_U238_356(U238_356_file, test_dir):
     pointwise = np.genfromtxt(test_dir / f"{title}_pointwise.csv", delimiter=",")
     assert pointwise[0, 0] == obj.energy_boundaries[0]
     assert pointwise[0, 1] == obj.pointwise[1].values[0]
-    assert pointwise[0, 3] == 1.829257
+    assert pointwise[0, 2] == 1.829257
     assert pointwise[0, 4] == 2.44304
 
     assert len(pointwise[0]) == 5
