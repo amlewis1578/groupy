@@ -5,3 +5,4 @@
  - `0.4.0` - Adding command line interface
  - `0.5.0` - Set constant MT's and sum inelastics
     - `0.5.1` - Fix reading of group energies when there are less than 4 groups
+ - `0.6.0` - Changed default pointwise MTs and added parameters to choose mts
