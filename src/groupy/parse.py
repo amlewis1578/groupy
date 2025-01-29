@@ -92,13 +92,21 @@ class GrouprOutput:
             else:
                 raise NotImplementedError(f"GrouprOutput can't yet parse MF{mf}")
 
-    def write_to_csv(self, title=None, directory=None, verbose=False):
+    def write_to_csv(
+        self,
+        title=None,
+        directory=None,
+        verbose=False,
+        pointwise_mts=None,
+        distribution_mts=None,
+        scattering_mts=None,
+    ):
         """Function to write the grouped values into CSV files. When a reaction
         is not available in the evaluation, zeros are printed.
 
-        The specific MT's that will be written are:
+        The default MT's that will be written are:
 
-        pointwise - 1, 18, 452
+        pointwise - 1, 18, 102, 452
         distributions - 18
         scattering matrices - 2, 4, 11, 16, 17, 22-25, 28-37, 41, 42, 44, 45
 
@@ -124,38 +132,58 @@ class GrouprOutput:
         verbose : bool, optional, default is False
             If true, will print the files names as they are created
 
+        pointwise_mts : None or list of ints, optional, default is None
+            Which MT's to write out in the pointwise file. If None or not given,
+            the default MT's are [1, 18, 102, 452]. If a list of ints, the MT's
+            listed will be printed out. Zeros are printed for any MT that isn't
+            found.
+
+        distribution_mts : None or list of ints, optional, default is None
+            Which MT's to write out in the distribution file. If None or not given,
+            the default MT's are [18]. If a list of ints, the MT's listed will be
+            printed out. Zeros are printed for any MT that isn't found.
+
+        scattering_mts : None or list of ints, optional, default is None
+            Which MT's to write out in the scattering matrix files. If None
+            or not given, the default MT's are [2, 4, 11, 16, 17, 22-25, 28-37,
+            41, 42, 44, 45]. If a list of ints, the MT's listed will be printed
+            out. Zeros are printed for any MT that isn't found.
+
         Returns
         -------
         None
 
         """
 
-        pointwise_mts = [1, 18, 452]
-        distribution_mts = [18]
-        scattering_mts = [
-            2,
-            4,
-            11,
-            16,
-            17,
-            22,
-            23,
-            24,
-            25,
-            28,
-            29,
-            30,
-            32,
-            33,
-            34,
-            35,
-            36,
-            37,
-            41,
-            42,
-            44,
-            45,
-        ]
+        if pointwise_mts is None:
+            pointwise_mts = [1, 18, 102, 452]
+        if distribution_mts is None:
+            distribution_mts = [18]
+        if scattering_mts is None:
+            scattering_mts = [
+                2,
+                4,
+                11,
+                16,
+                17,
+                22,
+                23,
+                24,
+                25,
+                28,
+                29,
+                30,
+                32,
+                33,
+                34,
+                35,
+                36,
+                37,
+                41,
+                42,
+                44,
+                45,
+            ]
 
         # create file title
         if title is None:
