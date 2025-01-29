@@ -120,6 +120,9 @@ class GrouprOutput:
             {title}_scattering_matrix_{mt}_{ell}.csv, with the energy boundaries
             as the row and column headers.
 
+        If any of the mt parameters are empty lists, the relevant file(s) will
+        not be created.
+
         Parameters
         ----------
         title : string, optional, default is None
@@ -195,92 +198,99 @@ class GrouprOutput:
             stem = f"{directory}/{stem}"
 
         # pointwise
-        filename = Path(f"{stem}pointwise.csv")
+        if len(pointwise_mts) > 0:
+            filename = Path(f"{stem}pointwise.csv")
 
-        header = "Energy"
-        array = np.array(self.energy_boundaries).reshape(
-            (len(self.energy_boundaries), 1)
-        )
-        for mt in pointwise_mts:
-            header += f",MT{mt}"
-            if mt in self.pointwise.keys():
-                array = np.hstack(
-                    [
-                        array,
-                        np.append(self.pointwise[mt].values, 0).reshape(
-                            (len(self.energy_boundaries), 1)
-                        ),
-                    ]
-                )
-            elif mt == 4:
-                total_inel = np.zeros(len(self.energy_boundaries))
-                for partial_mt in range(51, 92):
-                    if partial_mt in self.pointwise.keys():
-                        total_inel[:-1] += self.pointwise[partial_mt].values
-
-                array = np.hstack(
-                    [
-                        array,
-                        total_inel.reshape((len(self.energy_boundaries), 1)),
-                    ]
-                )
-            else:
-                array = np.hstack([array, np.zeros((len(self.energy_boundaries), 1))])
-
-        if verbose:
-            print(f"\nWriting pointwise data to {filename}")
-        np.savetxt(filename, array, delimiter=",", header=header)
-
-        # distributions
-        filename = Path(f"{stem}outgoing.csv")
-
-        header = "Energy"
-        array = np.array(self.energy_boundaries).reshape(
-            (len(self.energy_boundaries), 1)
-        )
-        for mt in distribution_mts:
-            header += f",MT{mt}"
-            if (
-                hasattr(self, "outgoing_distributions")
-                and mt in self.outgoing_distributions.keys()
-            ):
-                array = np.hstack(
-                    [
-                        array,
-                        np.append(self.outgoing_distributions[mt].values, 0).reshape(
-                            (len(self.energy_boundaries), 1)
-                        ),
-                    ]
-                )
-            else:
-                array = np.hstack([array, np.zeros((len(self.energy_boundaries), 1))])
-
-        if verbose:
-            print(f"\nWriting outgoing energy distribution data to {filename}")
-        np.savetxt(filename, array, delimiter=",", header=header)
-
-        # scattering matrices
-        for mt in scattering_mts:
-            filename = Path(f"{stem}scattering_matrix_{mt}.csv")
-            array = np.zeros(
-                (
-                    len(self.energy_boundaries) + 1,
-                    len(self.energy_boundaries) + 1,
-                )
+            header = "Energy"
+            array = np.array(self.energy_boundaries).reshape(
+                (len(self.energy_boundaries), 1)
             )
-            array[1:, 0] = self.energy_boundaries
-            array[0, 1:] = self.energy_boundaries
-            if hasattr(self, "scattering_matrices"):
-                if mt in self.scattering_matrices.keys():
-                    array[1:-1, 1:-1] = self.scattering_matrices[mt].values[:, :, 0]
+            for mt in pointwise_mts:
+                header += f",MT{mt}"
+                if mt in self.pointwise.keys():
+                    array = np.hstack(
+                        [
+                            array,
+                            np.append(self.pointwise[mt].values, 0).reshape(
+                                (len(self.energy_boundaries), 1)
+                            ),
+                        ]
+                    )
                 elif mt == 4:
+                    total_inel = np.zeros(len(self.energy_boundaries))
                     for partial_mt in range(51, 92):
-                        if partial_mt in self.scattering_matrices.keys():
-                            array[1:-1, 1:-1] += self.scattering_matrices[
-                                partial_mt
-                            ].values[:, :, 0]
+                        if partial_mt in self.pointwise.keys():
+                            total_inel[:-1] += self.pointwise[partial_mt].values
+
+                    array = np.hstack(
+                        [
+                            array,
+                            total_inel.reshape((len(self.energy_boundaries), 1)),
+                        ]
+                    )
+                else:
+                    array = np.hstack(
+                        [array, np.zeros((len(self.energy_boundaries), 1))]
+                    )
 
             if verbose:
-                print(f"Writing MT{mt} ell=0 scattering matrix to {filename}")
+                print(f"\nWriting pointwise data to {filename}")
+            np.savetxt(filename, array, delimiter=",", header=header)
 
-            np.savetxt(filename, array, delimiter=",")
+        # distributions
+        if len(distribution_mts) > 0:
+            filename = Path(f"{stem}outgoing.csv")
+
+            header = "Energy"
+            array = np.array(self.energy_boundaries).reshape(
+                (len(self.energy_boundaries), 1)
+            )
+            for mt in distribution_mts:
+                header += f",MT{mt}"
+                if (
+                    hasattr(self, "outgoing_distributions")
+                    and mt in self.outgoing_distributions.keys()
+                ):
+                    array = np.hstack(
+                        [
+                            array,
+                            np.append(
+                                self.outgoing_distributions[mt].values, 0
+                            ).reshape((len(self.energy_boundaries), 1)),
+                        ]
+                    )
+                else:
+                    array = np.hstack(
+                        [array, np.zeros((len(self.energy_boundaries), 1))]
+                    )
+
+            if verbose:
+                print(f"\nWriting outgoing energy distribution data to {filename}")
+            np.savetxt(filename, array, delimiter=",", header=header)
+
+        # scattering matrices
+        if len(scattering_mts) > 0:
+            for mt in scattering_mts:
+                filename = Path(f"{stem}scattering_matrix_{mt}.csv")
+                array = np.zeros(
+                    (
+                        len(self.energy_boundaries) + 1,
+                        len(self.energy_boundaries) + 1,
+                    )
+                )
+                array[1:, 0] = self.energy_boundaries
+                array[0, 1:] = self.energy_boundaries
+                if hasattr(self, "scattering_matrices"):
+                    if mt in self.scattering_matrices.keys():
+                        array[1:-1, 1:-1] = self.scattering_matrices[mt].values[:, :, 0]
+                    elif mt == 4:
+                        for partial_mt in range(51, 92):
+                            if partial_mt in self.scattering_matrices.keys():
+                                array[1:-1, 1:-1] += self.scattering_matrices[
+                                    partial_mt
+                                ].values[:, :, 0]
+
+                if verbose:
+                    print(f"Writing MT{mt} ell=0 scattering matrix to {filename}")
+
+                np.savetxt(filename, array, delimiter=",")

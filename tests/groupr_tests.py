@@ -64,3 +64,24 @@ def test_U238_356(U238_356_file, test_dir):
             total[:-1, :-1] += obj.scattering_matrices[mt].values[:, :, 0]
 
     assert np.allclose(total, inel[1:, 1:])
+
+
+def test_choosing_mts(U238_356_file, test_dir):
+    obj = GrouprOutput(U238_356_file)
+    title = "testMTs"
+    obj.write_to_csv(
+        title=title,
+        verbose=True,
+        directory=test_dir,
+        distribution_mts=[],
+        pointwise_mts=[1],
+        scattering_mts=[4, 11],
+    )
+
+    pointwise = np.genfromtxt(test_dir / f"{title}_pointwise.csv", delimiter=",")
+    assert len(pointwise[0]) == 2
+
+    dist_file = test_dir / f"{title}_outgoing.csv"
+    assert not dist_file.exists()
+
+    assert len(list(Path(test_dir).glob(f"{title}_scattering_matrix*.csv"))) == 2
